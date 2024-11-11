@@ -904,7 +904,7 @@ def plot_field(center, field_fov,
                    stars[star_catalogs[catalog]['dec']]*u.deg, 
                    s=star_size, c=src_color)
     # Frame
-    ax.set_xlim((center.ra-0.5*field_fov[0]).to(u.deg).value,(center.ra+0.5*field_fov[0]).to(u.deg).value)
+    ax.set_xlim((center.ra+0.5*field_fov[0]).to(u.deg).value,(center.ra-0.5*field_fov[0]).to(u.deg).value)
     ax.set_ylim((center.dec-0.5*field_fov[1]).to(u.deg).value,(center.dec+0.5*field_fov[1]).to(u.deg).value)
     # Data
     if legend:
