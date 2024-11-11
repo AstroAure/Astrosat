@@ -31,7 +31,7 @@ dependencies = [
 ]
 
 [project.urls]
-Source = "https://github.com/AstroAure"
+Source = "https://github.com/AstroAure/satastro"
 
 [tool.setuptools.packages.find]
 where = ["src"]
