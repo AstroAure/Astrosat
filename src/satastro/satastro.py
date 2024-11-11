@@ -40,14 +40,18 @@ def units_arange(start:u.Quantity, end:u.Quantity, step:u.Quantity):
     Generate an array of values with units, starting from 'start' to 'end' with a given 'step'.
 
     Parameters
-    --------
-    start (u.Quantity): The starting value with units.
-    end (u.Quantity): The ending value with units.
-    step (u.Quantity): The step size with units.
+    ----------
+    start : u.Quantity
+        The starting value with units.
+    end : u.Quantity
+        The ending value with units.
+    step : u.Quantity
+        The step size with units.
 
     Returns
-    --------
-    u.Quantity: An array of values with the same units as the input.
+    -------
+    u.Quantity
+        An array of values with the same units as the input.
     """
     end = end.to(start.unit)
     step = step.to(start.unit)
@@ -66,13 +70,15 @@ def request_horizons(**kwargs):
     The response from the API is returned as a string.
 
     Parameters
-    --------
-    **kwargs: Arbitrary keyword arguments to be included in the Horizons request.
-    (https://ssd-api.jpl.nasa.gov/doc/horizons.html)
+    ----------
+    **kwargs : dict
+        Arbitrary keyword arguments to be included in the Horizons request.
+        (https://ssd-api.jpl.nasa.gov/doc/horizons.html)
 
     Returns
-    --------
-    str: The response text from the Horizons API.
+    -------
+    str
+        The response text from the Horizons API.
 
     Examples
     --------
@@ -97,12 +103,14 @@ def horizons_to_dataframe(text):
     with a header row three lines above the "$$SOE" marker.
 
     Parameters
-    --------
-    text (str): The input text containing the Horizons data.
+    ----------
+    text : str
+        The input text containing the Horizons data.
 
     Returns
-    --------
-    pd.DataFrame: A DataFrame containing the parsed data with appropriate column names.
+    -------
+    pd.DataFrame
+        A DataFrame containing the parsed data with appropriate column names.
     """
     def parse_str(string):
         try:
@@ -122,19 +130,22 @@ def horizons_to_TEME(df, time='JDUT'):
     Convert a DataFrame containing position and velocity data from the HORIZONS system to the TEME frame.
 
     Parameters
-    --------
-    df (pandas.DataFrame): DataFrame containing the following columns:
+    ----------
+    df : pandas.DataFrame
+        DataFrame containing the following columns:
         - 'X': X position in kilometers
         - 'Y': Y position in kilometers
         - 'Z': Z position in kilometers
         - 'VX': X velocity in kilometers per second
         - 'VY': Y velocity in kilometers per second
         - 'VZ': Z velocity in kilometers per second
-        - time (str): Column name for the time data in Julian Date (default is 'JDUT')
+    time : str, optional
+        Column name for the time data in Julian Date (default is 'JDUT').
 
     Returns
-    --------
-    astropy.coordinates.builtin_frames.teme.TEME: TEME frame object containing the position and velocity data.
+    -------
+    astropy.coordinates.builtin_frames.teme.TEME
+        TEME frame object containing the position and velocity data.
     """
     epoch = Time(df[time], scale='utc', format='jd')
     pos = CartesianRepresentation(df['X'], df['Y'], df['Z'], unit=u.km)
@@ -150,16 +161,22 @@ def plot_world(color=False, figsize=(10,6), projection=ccrs.PlateCarree(), resol
     Plots a world map using Cartopy.
 
     Parameters
-    --------
-    color (bool): If True, uses a stock image for the map. If False, uses coastlines.
-    figsize (tuple): Size of the figure in inches, default is (10, 6).
-    projection (ccrs.Projection): Cartopy projection to use for the map, default is PlateCarree.
-    resolution (str): Resolution of the coastlines. Options are 'low', 'mid', 'high'. Default is 'low'.
+    ----------
+    color : bool, optional
+        If True, uses a stock image for the map. If False, uses coastlines.
+    figsize : tuple, optional
+        Size of the figure in inches, default is (10, 6).
+    projection : ccrs.Projection, optional
+        Cartopy projection to use for the map, default is PlateCarree.
+    resolution : str, optional
+        Resolution of the coastlines. Options are 'low', 'mid', 'high'. Default is 'low'.
 
     Returns
-    --------
-    fig (matplotlib.figure.Figure): The created figure.
-    ax (matplotlib.axes._subplots.AxesSubplot): The created subplot axes.
+    -------
+    fig : matplotlib.figure.Figure
+        The created figure.
+    ax : matplotlib.axes._subplots.AxesSubplot
+        The created subplot axes.
     """
     fig, ax = plt.subplots(figsize=figsize, subplot_kw={'projection':projection})
     if color: 
@@ -176,17 +193,17 @@ def plot_trace(teme, ax=None, color='plasma'):
     Plots the trace of a satellite's trajectory on a world map.
 
     Parameters
-    --------
-    teme : `~astropy.coordinates.BaseCoordinateFrame`
+    ----------
+    teme : astropy.coordinates.BaseCoordinateFrame
         The satellite's position in TEME (True Equator Mean Equinox) coordinates.
-    ax : `matplotlib.axes._subplots.AxesSubplot`, optional
+    ax : matplotlib.axes._subplots.AxesSubplot, optional
         The matplotlib axes to plot on. If None, a new world map will be created.
     color : str, optional
         The colormap to use for the trace. Default is 'plasma'. Must be a valid colormap name.
 
     Returns
-    --------
-    ax : `matplotlib.axes._subplots.AxesSubplot`
+    -------
+    ax : matplotlib.axes._subplots.AxesSubplot
         The matplotlib axes with the plotted trace.
     """
     if ax is None:ax = plot_world()[1]
@@ -202,12 +219,14 @@ def plot_earth_3D(ax, res=20):
     Plots a 3D wireframe representation of the Earth on the given Axes object.
 
     Parameters
-    --------
-    ax (matplotlib.axes._subplots.Axes3DSubplot): The 3D axes on which to plot the Earth.
-    res (int, optional): The resolution of the wireframe grid. Higher values result in a finer grid. Default is 20.
+    ----------
+    ax : matplotlib.axes._subplots.Axes3DSubplot
+        The 3D axes on which to plot the Earth.
+    res : int, optional
+        The resolution of the wireframe grid. Higher values result in a finer grid. Default is 20.
 
     Returns
-    --------
+    -------
     None
     """
     R = Earth.R.to(u.km).value
@@ -222,16 +241,19 @@ def plot_3D_cartesian(cartesian_dict, figsize=(15,8), lim=3e4):
     Plots 3D Cartesian coordinates in three orthogonal projections (XY, XZ, YZ planes).
 
     Parameters
-    --------
-    cartesian_dict (list of dict): A list of dictionaries where each dictionary represents an object with the following keys:
+    ----------
+    cartesian_dict : list of dict
+        A list of dictionaries where each dictionary represents an object with the following keys:
         - 'cartesian': A `~astropy.coordinates.CartesianRepresentation` object representing the object's position.
         - 'color' (optional): A string representing the color of the plot.
         - 'label' (optional): A string representing the label of the object.
-    figsize (tuple, optional): A tuple representing the size of the figure. Default is (15, 8).
-    lim (float, optional): The limit for the axes. Default is 3e4.
+    figsize : tuple, optional
+        A tuple representing the size of the figure. Default is (15, 8).
+    lim : float, optional
+        The limit for the axes. Default is 3e4.
 
     Returns
-    --------
+    -------
     None
     """
     fig, axs = plt.subplots(1,3,figsize=(15,8), subplot_kw={'projection':'3d'}, gridspec_kw={'hspace':0, 'wspace':0})
@@ -264,19 +286,24 @@ def dawn_dusk(start, end, lat, lon, darkness='civil'):
     Calculate the dawn and dusk times for a given location and date range.
 
     Parameters
-    --------
-    start (datetime or astropy.time.Time): The start date and time.
-    end (datetime or astropy.time.Time): The end date and time.
-    lat (float): Latitude of the location.
-    lon (float): Longitude of the location.
-    darkness (str, optional): Type of twilight to consider ('civil', 'nautical', 'astronomical'). 
-                              Defaults to 'civil'.
+    ----------
+    start : datetime or astropy.time.Time
+        The start date and time.
+    end : datetime or astropy.time.Time
+        The end date and time.
+    lat : float
+        Latitude of the location.
+    lon : float
+        Longitude of the location.
+    darkness : str, optional
+        Type of twilight to consider ('civil', 'nautical', 'astronomical'). Defaults to 'civil'.
 
     Returns
-    --------
-    list: A list of lists, where each inner list contains two elements:
-          [dusk_time, dawn_time] for each night in the date range.
-          If dusk or dawn time is not available, it will be None.
+    -------
+    list
+        A list of lists, where each inner list contains two elements:
+        [dusk_time, dawn_time] for each night in the date range.
+        If dusk or dawn time is not available, it will be None.
     """
     if type(start)==Time: start=start.to_datetime()
     if type(end)==Time: end=end.to_datetime()
@@ -305,17 +332,24 @@ def plot_night(ax, start, end, lat, lon, darkness=['civil', 'nautical', 'astrono
     Plots periods of night on a given matplotlib axis.
 
     Parameters
-    --------
-    ax (matplotlib.axes.Axes): The matplotlib axis to plot on.
-    start (datetime.datetime or astropy.time.Time): The start time of the plotting range.
-    end (datetime.datetime or astropy.time.Time): The end time of the plotting range.
-    lat (float): Latitude of the location.
-    lon (float): Longitude of the location.
-    darkness (list of str, optional): Types of darkness to plot. Options are 'civil', 'nautical', and 'astronomical'. Defaults to ['civil', 'nautical', 'astronomical'].
-    alpha (float, optional): Transparency level of the night shading. Defaults to 0.2.
+    ----------
+    ax : matplotlib.axes.Axes
+        The matplotlib axis to plot on.
+    start : datetime.datetime or astropy.time.Time
+        The start time of the plotting range.
+    end : datetime.datetime or astropy.time.Time
+        The end time of the plotting range.
+    lat : float
+        Latitude of the location.
+    lon : float
+        Longitude of the location.
+    darkness : list of str, optional
+        Types of darkness to plot. Options are 'civil', 'nautical', and 'astronomical'. Defaults to ['civil', 'nautical', 'astronomical'].
+    alpha : float, optional
+        Transparency level of the night shading. Defaults to 0.2.
 
     Returns
-    --------
+    -------
     None
     """
     if type(start)==Time: start=start.to_datetime()
@@ -332,13 +366,16 @@ def plot_atmosphere(ax, start, end):
     Plots the atmosphere on a given axis.
 
     Parameters
-    --------
-    ax (matplotlib.axes.Axes): The axis on which to plot the atmosphere.
-    start (float): The starting x-coordinate for the plot.
-    end (float): The ending x-coordinate for the plot.
+    ----------
+    ax : matplotlib.axes.Axes
+        The axis on which to plot the atmosphere.
+    start : float
+        The starting x-coordinate for the plot.
+    end : float
+        The ending x-coordinate for the plot.
 
     Returns
-    --------
+    -------
     None
     """
     ax.imshow([[0,0],[0.5,0.5]], 
@@ -355,12 +392,14 @@ def sso_inclination(a):
     Calculate the inclination for a Sun-synchronous orbit (SSO).
 
     Parameters
-    --------
-    a (Quantity): Semi-major axis of the orbit, with units of length.
+    ----------
+    a : Quantity
+        Semi-major axis of the orbit, with units of length.
 
     Returns
-    --------
-    Quantity: Inclination of the orbit in degrees.
+    -------
+    Quantity
+        Inclination of the orbit in degrees.
     """
     return np.arccos(-(a/(12352*u.km))**3.5).to(u.deg)
 
@@ -369,15 +408,18 @@ def orbit_to_TEME(orbit, epoch, perturbations=func_twobody):
     Converts an orbit to the True Equator Mean Equinox (TEME) coordinate system.
 
     Parameters
-    --------
-    orbit (Orbit): The orbit object to be converted.
-    epoch (datetime): The epoch at which the conversion is to be performed.
-    perturbations (function, optional): The perturbation function to be used in the conversion. 
-                                        Defaults to `~poliastro.core.propagation.func_twobody`.
+    ----------
+    orbit : Orbit
+        The orbit object to be converted.
+    epoch : datetime
+        The epoch at which the conversion is to be performed.
+    perturbations : function, optional
+        The perturbation function to be used in the conversion. Defaults to `~poliastro.core.propagation.func_twobody`.
 
     Returns
-    --------
-    TEME: The position in the TEME coordinate system.
+    -------
+    TEME
+        The position in the TEME coordinate system.
     """
     ephem = orbit.to_ephem(strategy=EpochsArray(epochs=epoch, method=CowellPropagator(f=perturbations)))
     pos = ephem.sample(ephem.epochs)
@@ -390,7 +432,7 @@ def J2(t0, state, k):
     two-body problem and the J2 perturbation.
 
     Parameters
-    --------
+    ----------
     t0 : float
         The initial time.
     state : array_like
@@ -399,7 +441,7 @@ def J2(t0, state, k):
         The gravitational parameter of the central body.
 
     Returns
-    --------
+    -------
     numpy.ndarray
         The time derivative of the state vector including the J2 perturbation.
     """
@@ -418,12 +460,14 @@ def cartesian_to_radec(cartesian):
     Convert Cartesian coordinates to Right Ascension (RA) and Declination (Dec).
 
     Parameters
-    --------
-    cartesian (CartesianRepresentation): A Cartesian representation of the coordinates.
+    ----------
+    cartesian : CartesianRepresentation
+        A Cartesian representation of the coordinates.
 
     Returns
-    --------
-    SkyCoord: The corresponding coordinates in the ICRS frame with RA and Dec in degrees.
+    -------
+    SkyCoord
+        The corresponding coordinates in the ICRS frame with RA and Dec in degrees.
     """
     ra = np.arctan2(cartesian.y, cartesian.x).to(u.deg)
     ra = np.putmask(ra, ra<0 ,ra+360*u.deg)
@@ -436,14 +480,16 @@ def astrometry_target(target_teme, observer):
     Calculate the astrometric position of a target object as observed from a satellite.
 
     Parameters
-    --------
-    target_teme (BaseCoordinateFrame): The target's position in TEME frame.
-    observer (BaseCoordinateFrame): The observer's position in TEME frame.
-    mask (array-like, optional): A boolean mask to filter the target positions.
+    ----------
+    target_teme : BaseCoordinateFrame
+        The target's position in TEME frame.
+    observer : BaseCoordinateFrame
+        The observer's position in TEME frame.
 
     Returns
-    --------
-    SkyCoord: The right ascension and declination of the target.
+    -------
+    SkyCoord
+        The right ascension and declination of the target.
     """
     if isinstance(observer, EarthLocation): observer = TEME(observer.to_geocentric())
     target_obs = target_teme.cartesian.without_differentials() - observer.cartesian.without_differentials()
@@ -462,7 +508,7 @@ def astrometry_target_plot(target_teme, observer,
     Plots the astrometric position of a target object as observed from a satellite.
 
     Parameters
-    --------
+    ----------
     target_teme : `~astropy.coordinates.BaseCoordinateFrame`
         The target's position in TEME frame.
     observer : `~astropy.coordinates.BaseCoordinateFrame` or `~astropy.coordinates.EarthLocation`
@@ -485,14 +531,14 @@ def astrometry_target_plot(target_teme, observer,
         If True, returns the color array used in the scatter plot.
 
     Returns
-    --------
+    -------
     target_obs_radec : `~astropy.coordinates.SkyCoord`
         The right ascension and declination of the target if `return_radec` is True.
     color : array-like
         The color array used in the scatter plot if `return_color` is True.
 
     Notes
-    ------
+    -----
     The function calculates the relative position of the target with respect to the observer,
     converts it to right ascension and declination, and plots it on a scatter plot.
     """
@@ -520,7 +566,7 @@ def proper_motion(radec, dt=None, epoch=None):
     Calculate the proper motion of celestial objects.
 
     Parameters
-    --------
+    ----------
     radec : `astropy.coordinates.SkyCoord`
         The right ascension and declination coordinates of the celestial objects.
     dt : `astropy.units.Quantity`, optional
@@ -529,12 +575,12 @@ def proper_motion(radec, dt=None, epoch=None):
         A tuple containing two `Time` objects representing the start and end epochs. If provided, `dt` will be calculated as the difference between these epochs.
 
     Returns
-    --------
+    -------
     pm : `astropy.units.Quantity`
         The proper motion in arcseconds per second.
 
-    Raises:
-    --------
+    Raises
+    ------
     ValueError
         If neither `dt` nor `epoch` is specified.
     """
@@ -550,14 +596,14 @@ def earth_target_eclipse(observer_teme, target_teme):
     ensuring that the distance is not less than the Earth's radius.
 
     Parameters
-    --------
+    ----------
     observer_teme : astropy.coordinates.BaseCoordinateFrame
         The position of the observer in the TEME (True Equator Mean Equinox) frame.
     target_teme : astropy.coordinates.BaseCoordinateFrame
         The position of the target in the TEME frame.
 
     Returns
-    --------
+    -------
     numpy.ndarray
         An array of distances from the observer to the target, with values 
         less than the Earth's radius set to the Earth's radius.
@@ -579,14 +625,14 @@ def target_visibility_plot(observer_teme, target_teme,
     Plots the visibility of a target from a satellite observer.
 
     Parameters
-    --------
-    observer_teme : `astropy.coordinates.SkyCoord`
+    ----------
+    observer_teme : astropy.coordinates.SkyCoord
         The satellite observer's position in TEME coordinates.
-    target_teme : `astropy.coordinates.SkyCoord`
+    target_teme : astropy.coordinates.SkyCoord
         The target's position in TEME coordinates.
-    fig : `matplotlib.figure.Figure`, optional
+    fig : matplotlib.figure.Figure, optional
         The figure object to plot on. If None, a new figure is created.
-    ax : `matplotlib.axes.Axes`, optional
+    ax : matplotlib.axes.Axes, optional
         The axes object to plot on. If None, new axes are created.
     figsize : tuple, optional
         The size of the figure in inches. Default is (10, 5).
@@ -598,12 +644,12 @@ def target_visibility_plot(observer_teme, target_teme,
         If True, the function returns the visibility data. Default is False.
 
     Returns
-    --------
-    closest_earth : `astropy.units.Quantity`, optional
+    -------
+    closest_earth : astropy.units.Quantity, optional
         The distance between the target and the Earth center, if `return_vis` is True.
 
     Notes
-    --------
+    -----
     The function plots the distance between the target and the Earth center over time,
     highlighting the Earth's radius and the atmospheric layers.
     """
@@ -630,15 +676,15 @@ def TEME_to_altaz(teme, loc):
     Convert TEME (True Equator Mean Equinox) coordinates to AltAz (Altitude-Azimuth) coordinates.
 
     Parameters
-    --------
-    teme : `astropy.coordinates.SkyCoord`
+    ----------
+    teme : astropy.coordinates.SkyCoord
         The input coordinates in the TEME frame.
-    loc : `astropy.coordinates.EarthLocation`
+    loc : astropy.coordinates.EarthLocation
         The observer's location on Earth.
 
     Returns
-    --------
-    altaz : `astropy.coordinates.SkyCoord`
+    -------
+    altaz : astropy.coordinates.SkyCoord
         The coordinates in the AltAz frame.
     """
     itrs = teme.transform_to(ITRS(obstime=teme.obstime))
@@ -652,7 +698,7 @@ def airmass_plot(teme, loc, fig=None, ax=None, color='plasma', figsize=(10,5), y
     Plots the airmass (altitude) of a satellite over time.
 
     Parameters
-    --------
+    ----------
     teme : astropy.coordinates.TEME
         The TEME (True Equator Mean Equinox) coordinates of the satellite.
     loc : astropy.coordinates.EarthLocation
@@ -669,7 +715,7 @@ def airmass_plot(teme, loc, fig=None, ax=None, color='plasma', figsize=(10,5), y
         The limits for the y-axis (altitude). Default is (0, 90).
 
     Returns
-    --------
+    -------
     None
     """
     altaz = TEME_to_altaz(teme, loc)
@@ -693,12 +739,12 @@ def UVW_coordinate_frame(teme):
     Calculate the UVW coordinate frame from a given TEME (True Equator Mean Equinox) frame.
 
     Parameters
-    --------
+    ----------
     teme : astropy.coordinates.BaseCoordinateFrame
         The TEME frame containing the position and velocity vectors.
 
     Returns
-    --------
+    -------
     numpy.ndarray
         A 3x3 numpy array where each row represents the U, V, and W unit vectors respectively.
         - U: Unit vector in the direction of the position vector.
@@ -720,14 +766,18 @@ def calc_altaz_error(uvw_error, teme, gs_loc):
     Calculate the altitude-azimuth error for a satellite given its position error in the UVW coordinate frame.
 
     Parameters
-    --------
-    uvw_error (array-like): The position error in the UVW coordinate frame.
-    teme (TEME): The satellite's position in the TEME coordinate frame.
-    gs_loc (EarthLocation): The ground station location.
+    ----------
+    uvw_error : array-like
+        The position error in the UVW coordinate frame.
+    teme : TEME
+        The satellite's position in the TEME coordinate frame.
+    gs_loc : EarthLocation
+        The ground station location.
 
     Returns
-    --------
-    AltAz: The altitude-azimuth coordinates of the satellite with the position error applied.
+    -------
+    AltAz
+        The altitude-azimuth coordinates of the satellite with the position error applied.
     """
     sat_uvw = UVW_coordinate_frame(teme)
     pos_error = sat_uvw[0]*uvw_error[0] + sat_uvw[1]*uvw_error[1] + sat_uvw[2]*uvw_error[2]
@@ -746,15 +796,18 @@ def mag_to_marker_size(mag, limiting_mag=10.0):
     Convert magnitude to marker size for plotting.
 
     Parameters
-    --------
-    mag (array-like): Array of magnitudes.
-    limiting_mag (float, optional): The limiting magnitude. Default is 10.0.
+    ----------
+    mag : array-like
+        Array of magnitudes.
+    limiting_mag : float, optional
+        The limiting magnitude. Default is 10.0.
 
     Returns
-    --------
-    array-like: Array of marker sizes corresponding to the input magnitudes.
-                Marker size is calculated as (0.5 + limiting_mag - mag)**2.
-                If a magnitude is greater than the limiting magnitude, the marker size is set to 0.
+    -------
+    array-like
+        Array of marker sizes corresponding to the input magnitudes.
+        Marker size is calculated as (0.5 + limiting_mag - mag)**2.
+        If a magnitude is greater than the limiting magnitude, the marker size is set to 0.
     """
     size = (0.5 + limiting_mag - mag)**2
     size[mag>limiting_mag] = 0
@@ -765,12 +818,14 @@ def str_fov(field_fov):
     Convert a list of field of view (FOV) values to a formatted string.
 
     Parameters
-    --------
-    field_fov (list of astropy.units.Quantity): A list of FOV values with units (e.g., degrees, arcminutes, arcseconds).
+    ----------
+    field_fov : list of astropy.units.Quantity
+        A list of FOV values with units (e.g., degrees, arcminutes, arcseconds).
 
     Returns
-    --------
-    str: A formatted string representing the FOV values, separated by ' x ' and with appropriate unit symbols.
+    -------
+    str
+        A formatted string representing the FOV values, separated by ' x ' and with appropriate unit symbols.
     """
     unit = {u.deg:'°', u.arcmin:"'", u.arcsec:'"'}
     string = ' x '.join([f"{fov.value:.1f}{unit[fov.unit]}" for fov in field_fov])
@@ -781,14 +836,16 @@ def str_coord(coord):
     Convert a coordinate object to a formatted string representation.
 
     Parameters
-    --------
-    coord (object): An object with 'ra' (right ascension) and 'dec' (declination) attributes.
-                    'ra' should have 'hms' (hours, minutes, seconds) attributes.
-                    'dec' should have 'signed_dms' (degrees, minutes, seconds) attributes.
+    ----------
+    coord : object
+        An object with 'ra' (right ascension) and 'dec' (declination) attributes.
+        'ra' should have 'hms' (hours, minutes, seconds) attributes.
+        'dec' should have 'signed_dms' (degrees, minutes, seconds) attributes.
 
     Returns
-    --------
-    str: A string representation of the coordinates in the format "HHhMMmSS.SS +DDD°MM'SS.SS".
+    -------
+    str
+        A string representation of the coordinates in the format "HHhMMmSS.SS +DDD°MM'SS.SS".
     """
     ra = coord.ra.hms
     dec = coord.dec.signed_dms
@@ -806,21 +863,32 @@ def plot_field(center, field_fov,
     Plots a star field centered on a given coordinate.
 
     Parameters
-    --------
-    center (SkyCoord): The central coordinate of the field.
-    field_fov (tuple): The field of view dimensions (width, height) in degrees.
-    catalog (str, optional): The star catalog to use. Default is 'UCAC4'. Possible values are 'UCAC4' and 'GaiaDR3'.
-    limiting_mag (float, optional): The limiting magnitude for stars to be plotted. Default is 12.0.
-    epoch (Time, optional): The epoch of the observation. Default is None.
-    legend (bool, optional): Whether to display the legend. Default is True.
-    fig (Figure, optional): Matplotlib figure object. Default is None.
-    ax (Axes, optional): Matplotlib axes object. Default is None.
-    figsize (tuple, optional): Size of the figure. Default is (8, 8).
-    invert (bool, optional): Whether to invert the colors. Default is True.
-    no_stars (bool, optional): Whether to plot stars. Default is False.
+    ----------
+    center : SkyCoord
+        The central coordinate of the field.
+    field_fov : tuple
+        The field of view dimensions (width, height) in degrees.
+    catalog : str, optional
+        The star catalog to use. Default is 'UCAC4'. Possible values are 'UCAC4' and 'GaiaDR3'.
+    limiting_mag : float, optional
+        The limiting magnitude for stars to be plotted. Default is 12.0.
+    epoch : Time, optional
+        The epoch of the observation. Default is None.
+    legend : bool, optional
+        Whether to display the legend. Default is True.
+    fig : Figure, optional
+        Matplotlib figure object. Default is None.
+    ax : Axes, optional
+        Matplotlib axes object. Default is None.
+    figsize : tuple, optional
+        Size of the figure. Default is (8, 8).
+    invert : bool, optional
+        Whether to invert the colors. Default is True.
+    no_stars : bool, optional
+        Whether to plot stars. Default is False.
 
     Returns
-    --------
+    -------
     None
     """
     new_fig = (fig is None) or (ax is None)
@@ -872,18 +940,26 @@ def add_map(ax, target, radec,
     Adds an inset map to the given axis with specified target and RA/DEC coordinates.
 
     Parameters
-    --------
-    ax (matplotlib.axes.Axes): The main axis to which the inset map will be added.
-    target (SkyCoord): The target coordinates (RA, DEC) to be highlighted on the map.
-    radec (SkyCoord): The RA/DEC coordinates to be plotted on the map.
-    target_color (str, optional): Color for the target marker. Default is 'r'.
-    radec_color (str, optional): Color for the RA/DEC markers. Default is 'lime'.
-    legend_color (str, optional): Color for the legend text and grid. Default is 'lime'.
-    shape_ins (list, optional): Shape of the inset map as [width, height]. Default is [0.3, 0.3].
-    pad_ins (float, optional): Padding around the inset map. Default is 0.03.
+    ----------
+    ax : matplotlib.axes.Axes
+        The main axis to which the inset map will be added.
+    target : SkyCoord
+        The target coordinates (RA, DEC) to be highlighted on the map.
+    radec : SkyCoord
+        The RA/DEC coordinates to be plotted on the map.
+    target_color : str, optional
+        Color for the target marker. Default is 'r'.
+    radec_color : str, optional
+        Color for the RA/DEC markers. Default is 'lime'.
+    legend_color : str, optional
+        Color for the legend text and grid. Default is 'lime'.
+    shape_ins : list, optional
+        Shape of the inset map as [width, height]. Default is [0.3, 0.3].
+    pad_ins : float, optional
+        Padding around the inset map. Default is 0.03.
 
     Returns
-    --------
+    -------
     None
     """
     ins = ax.inset_axes([1-shape_ins[0]-pad_ins,1-shape_ins[1]-pad_ins,shape_ins[0],shape_ins[1]])
@@ -978,28 +1054,42 @@ def batch_simulate_image(center_list, step=1, start=0,
                          save_dir='.', image_name='image',
                          target_radec_list=None,
                          epoch_list=None,
-                         field_fov=(5.0*u.deg, 5.0*u.deg), 
-                         limiting_mag=12.0,
+                         field_fov=(5.0*u.deg, 5.0*u.deg),
+                         limiting_mag=12.0, 
                          target_mag_list=None, invert=False,
                          visibility_list=None, color_list=None):
+
     """
     Simulates and saves a batch of images based on the provided parameters.
 
     Parameters
     --------
-    center_list (list): List of center coordinates for the images.
-    step (int, optional): Step size for iterating through the center_list. Default is 1.
-    start (int, optional): Starting index for the iteration. Default is 0.
-    save_dir (str, optional): Directory where the images will be saved. Default is '.'.
-    image_name (str, optional): Base name for the saved images. Default is 'image'.
-    target_radec_list (list, optional): List of target RA/DEC coordinates. Default is None.
-    epoch_list (list, optional): List of epochs for the images. Default is None.
-    field_fov (tuple, optional): Field of view for the images. Default is (5.0*u.deg, 5.0*u.deg).
-    limiting_mag (float, optional): Limiting magnitude for the images. Default is 12.0.
-    target_mag_list (list, optional): List of target magnitudes. Default is None.
-    invert (bool, optional): Whether to invert the image colors. Default is False.
-    visibility_list (list, optional): List of visibility parameters. Default is None.
-    color_list (list, optional): List of colors for the targets. Default is None.
+    center_list : list
+            List of center coordinates for the images.
+    step : int, optional
+        Step size for iterating through the center_list. Default is 1.
+    start : int, optional
+        Starting index for the iteration. Default is 0.
+    save_dir : str, optional
+        Directory where the images will be saved. Default is '.'.
+    image_name : str, optional
+        Base name for the saved images. Default is 'image'.
+    target_radec_list : list, optional
+        List of target RA/DEC coordinates. Default is None.
+    epoch_list : list, optional
+        List of epochs for the images. Default is None.
+    field_fov : tuple, optional
+        Field of view for the images. Default is (5.0*u.deg, 5.0*u.deg).
+    limiting_mag : float, optional
+        Limiting magnitude for the images. Default is 12.0.
+    target_mag_list : list, optional
+        List of target magnitudes. Default is None.
+    invert : bool, optional
+        Whether to invert the image colors. Default is False.
+    visibility_list : list, optional
+        List of visibility parameters. Default is None.
+    color_list : list, optional
+        List of colors for the targets. Default is None.
 
     Returns
     --------
@@ -1028,11 +1118,16 @@ def make_video(image_dir='.', image_name="*.png", save_dir='.', save_name='video
 
     Parameters
     --------
-    image_dir (str): Directory containing the images. Default is current directory.
-    image_name (str): Pattern to match image files. Default is "*.png".
-    save_dir (str): Directory to save the output video. Default is current directory.
-    save_name (str): Name of the output video file (without extension). Default is 'video'.
-    FPS (int): Frames per second for the output video. Default is 20.
+    image_dir : str, optional
+        Directory containing the images. Default is current directory.
+    image_name : str, optional
+        Pattern to match image files. Default is "*.png".
+    save_dir : str, optional
+        Directory to save the output video. Default is current directory.
+    save_name : str, optional
+        Name of the output video file (without extension). Default is 'video'.
+    FPS : int, optional
+        Frames per second for the output video. Default is 20.
 
     Returns
     --------
@@ -1055,16 +1150,21 @@ def compress_video(in_video, out_video, target_size_MB, delete_in=False):
 
     Parameters
     --------
-    in_video (str): Path to the input video file.
-    out_video (str): Path to the output compressed video file.
-    target_size_MB (float): Target size of the compressed video in megabytes.
-    delete_in (bool): If True, delete the input video file after compression. Default is False.
+    in_video : str
+        Path to the input video file.
+    out_video : str
+        Path to the output compressed video file.
+    target_size_MB : float
+        Target size of the compressed video in megabytes.
+    delete_in : bool, optional
+        If True, delete the input video file after compression. Default is False.
 
     Returns
     --------
     None
 
-    Reference:
+    Notes
+    --------
     https://en.wikipedia.org/wiki/Bit_rate#Encoding_bit_rate
     """
     probe = ffmpeg.probe(in_video)
