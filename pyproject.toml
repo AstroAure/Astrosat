@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "astrosat"
+version = "1.0.0"
+authors = [
+    {name="Aurélien Genin", email="aurelien.genin@polytechnique.org"}
+]
+description = "Mission analysis for astronomy mission with satellites"
+readme = "README.md"
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "tqdm",
+    "opencv-python",
+    "ffmpeg",
+    "numpy",
+    "pandas",
+    "matplotlib",
+    "astropy",
+    "poliastro",
+    "astroquery",
+    "cartopy",
+    "astral"
+]
+
+[project.urls]
+Source = "https://github.com/AstroAure"
+
+[tool.setuptools.packages.find]
+where = ["src"]
