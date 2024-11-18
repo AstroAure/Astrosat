@@ -761,6 +761,29 @@ def UVW_coordinate_frame(teme):
 
     return np.array([U,V,W])
 
+def add_uvw_error(uvw_error, teme):
+    """
+    Add UVW error to a satellite's TEME coordinates.
+
+    Parameters
+    ----------
+    uvw_error : array_like
+        The UVW error to be added to the satellite's position.
+    teme : `~astropy.coordinates.TEME`
+        The satellite's position in TEME coordinates.
+
+    Returns
+    -------
+    `~astropy.coordinates.TEME`
+        The satellite's new position in TEME coordinates with the UVW error added.
+    """
+    sat_uvw = UVW_coordinate_frame(teme)
+    pos_error = np.tensordot(uvw_error, sat_uvw, axes=1)
+    sat_cartesian = CartesianRepresentation(teme.cartesian.xyz + pos_error, 
+                                            differentials=teme.cartesian.differentials)
+    sat_teme = TEME(sat_cartesian, obstime=teme.obstime.to_datetime())
+    return sat_teme
+
 def calc_altaz_error(uvw_error, teme, gs_loc): 
     """
     Calculate the altitude-azimuth error for a satellite given its position error in the UVW coordinate frame.
@@ -779,11 +802,41 @@ def calc_altaz_error(uvw_error, teme, gs_loc):
     AltAz
         The altitude-azimuth coordinates of the satellite with the position error applied.
     """
-    sat_uvw = UVW_coordinate_frame(teme)
-    pos_error = sat_uvw[0]*uvw_error[0] + sat_uvw[1]*uvw_error[1] + sat_uvw[2]*uvw_error[2]
-    error_sat_teme = TEME(teme.cartesian.xyz + pos_error, obstime=teme.obstime.to_datetime())
+    error_sat_teme = add_uvw_error(uvw_error, teme)
     error_sat_altaz = TEME_to_altaz(error_sat_teme, gs_loc)
     return error_sat_altaz
+
+def altaz_add_offset(altaz, angle_offset_x, angle_offset_y):
+    """
+    Add an angle offset to an AltAz object
+    
+    Parameters
+    ----------
+    altaz : AltAz
+        The AltAz object
+    angle_offset_x : Quantity
+        The angle offset to add
+    angle_offset_y : Quantity
+        The angle offset to add
+        
+    Returns
+    -------
+    altaz : AltAz
+        The AltAz object with the added angle
+    """
+    alt, az = altaz.alt.to_value(u.rad), altaz.az.to_value(u.rad)
+    az += angle_offset_x.to_value(u.rad)/np.cos(alt)
+    alt += angle_offset_y.to_value(u.rad)
+    # Careful near pole -> Better control : az in [0, 180]°, alt in [0, 180]°
+    pole_change = alt>0.5*np.pi
+    try:
+        alt[pole_change] -= np.pi
+        az[pole_change] += np.pi
+    except:
+        if pole_change:
+            alt -= np.pi
+            az += np.pi
+    return AltAz(alt=alt*u.rad, az=az*u.rad, obstime=altaz.obstime, location=altaz.location)
 
 
 ### IMAGE SIMULATION ###
